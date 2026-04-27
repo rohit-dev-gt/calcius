@@ -5,10 +5,15 @@ let redisClient: Redis | null = null;
 export function getRedisClient(): Redis {
   if (!redisClient) {
     const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+
+    // Upstash uses rediss:// (TLS). Support both redis:// and rediss://
+    const isTLS = redisUrl.startsWith('rediss://');
+
     redisClient = new Redis(redisUrl, {
       maxRetriesPerRequest: 3,
       lazyConnect: true,
       enableOfflineQueue: false,
+      tls: isTLS ? { rejectUnauthorized: false } : undefined,
     });
 
     redisClient.on('error', (err) => {
