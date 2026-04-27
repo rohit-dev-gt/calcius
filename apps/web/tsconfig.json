@@ -12,10 +12,10 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "strict": true,
+    "types": ["vite/client"],
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
-    "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
       "@calcura/shared": ["../../packages/shared/src"]
