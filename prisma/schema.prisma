@@ -1,0 +1,154 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")   // pooled connection (port 6543) for runtime
+  directUrl = env("DIRECT_URL")     // direct connection (port 5432) for migrations
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ENUMS
+// ─────────────────────────────────────────────────────────────────────────────
+
+enum ModuleType {
+  ARITHMETIC
+  SQUARES
+  CUBES
+  TABLES
+  PERCENTAGES
+  FRACTIONS
+  HCF_LCM
+  POWERS
+  SERIES
+  BODMAS
+  AVERAGES
+  VEDIC
+  APPROXIMATION
+  MOCK
+}
+
+enum Difficulty {
+  BASIC
+  INTERMEDIATE
+  ADVANCED
+  GENIUS
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MODELS
+// ─────────────────────────────────────────────────────────────────────────────
+
+model User {
+  id           String    @id @default(cuid())
+  username     String    @unique
+  email        String    @unique
+  passwordHash String
+  avatarUrl    String?
+  country      String?
+  createdAt    DateTime  @default(now())
+  lastLoginAt  DateTime?
+
+  sessions     Session[]
+  questionLogs QuestionLog[]
+  moduleStats  ModuleStat[]
+  mockResults  MockResult[]
+  streak       Streak?
+  refreshTokens RefreshToken[]
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  revokedAt DateTime?
+
+  @@map("refresh_tokens")
+}
+
+model Session {
+  id            String        @id @default(cuid())
+  userId        String
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  module        ModuleType
+  difficulty    Difficulty
+  startedAt     DateTime      @default(now())
+  endedAt       DateTime?
+  questionCount Int           @default(0)
+  avgTime       Float?
+  bestTime      Float?
+  questions     QuestionLog[]
+
+  @@map("sessions")
+}
+
+model QuestionLog {
+  id           String     @id @default(cuid())
+  userId       String
+  sessionId    String
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  session      Session    @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  module       ModuleType
+  difficulty   Difficulty
+  questionText String
+  answer       String
+  timeTaken    Float      // seconds, 1 decimal precision
+  isCorrect    Boolean    @default(true)
+  practicedAt  DateTime   @default(now())
+
+  @@index([userId, module])
+  @@index([userId, practicedAt])
+  @@map("question_logs")
+}
+
+model ModuleStat {
+  id              String     @id @default(cuid())
+  userId          String
+  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  module          ModuleType
+  difficulty      Difficulty
+  totalQuestions  Int        @default(0)
+  totalTime       Float      @default(0)
+  avgTime         Float?
+  bestTime        Float?
+  lastPracticedAt DateTime?
+
+  @@unique([userId, module, difficulty])
+  @@index([userId])
+  @@map("module_stats")
+}
+
+model MockResult {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  totalQuestions Int
+  correctAnswers Int      @default(0)
+  timeLimitSecs  Int?
+  avgTime        Float
+  completedAt    DateTime @default(now())
+  breakdown      Json     // { module: { count, avgTime, correct } }
+
+  @@index([userId])
+  @@map("mock_results")
+}
+
+model Streak {
+  id       String    @id @default(cuid())
+  userId   String    @unique
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  current  Int       @default(0)
+  longest  Int       @default(0)
+  lastDate DateTime?
+
+  @@map("streaks")
+}
