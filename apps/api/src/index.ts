@@ -28,6 +28,7 @@ app.use(helmet({
 app.use(cors({
   origin: [
     process.env.FRONTEND_URL || 'http://localhost:5173',
+    'https://calcius-web.vercel.app',
     'https://calcura.vercel.app',
     'https://calcius.vercel.app',
     'http://localhost:5173',
