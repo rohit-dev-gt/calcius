@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "CommonJS",
+    "module": "Node16",
     "lib": ["ES2022"],
     "rootDir": "../..",
     "outDir": "dist",
@@ -12,11 +12,9 @@
     "resolveJsonModule": true,
     "declaration": false,
     "sourceMap": false,
-    "moduleResolution": "node",
-    "ignoreDeprecations": "5.0",
-    "baseUrl": ".",
+    "moduleResolution": "node16",
     "paths": {
-      "@calcura/shared": ["../../packages/shared/src"]
+      "@calcura/shared": ["../../packages/shared/src/index.ts"]
     }
   },
   "include": ["src/**/*", "../../packages/shared/src/**/*"],
