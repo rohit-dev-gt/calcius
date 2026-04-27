@@ -3,6 +3,7 @@
     "target": "ES2022",
     "module": "CommonJS",
     "lib": ["ES2022"],
+    "rootDir": "../..",
     "outDir": "dist",
     "strict": true,
     "esModuleInterop": true,
@@ -12,6 +13,7 @@
     "declaration": false,
     "sourceMap": false,
     "moduleResolution": "node",
+    "ignoreDeprecations": "5.0",
     "baseUrl": ".",
     "paths": {
       "@calcura/shared": ["../../packages/shared/src"]
